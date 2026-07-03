@@ -17,6 +17,9 @@ This repo pins **Next.js 16.2.9** (with React 19.2.4), which has breaking change
 
 There is no test runner configured yet.
 
+## Skills
+usa siempre /frontend-design para hacer interfaces de usuarios
+
 ## Architecture
 
 Next.js **App Router** project. Source lives in `app/` (currently the default scaffold: `layout.tsx`, `page.tsx`, `globals.css`). TypeScript is `strict`; the `@/*` path alias maps to the repo root.
