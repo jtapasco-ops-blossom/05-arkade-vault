@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone browser-global JSX prototypes — not part of the app, not meant to be linted.
+    "references/**",
   ]),
 ]);
 
