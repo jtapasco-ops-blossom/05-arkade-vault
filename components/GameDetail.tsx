@@ -41,10 +41,10 @@ export function GameDetail({ game }: { game: Game }) {
             </div>
           </div>
           <div className="detail-actions">
-            <Link href={`/jugar/${game.id}`} className="btn xl pulse">
+            <Link href={`/games/${game.id}/play`} className="btn xl pulse">
               ▶ JUGAR AHORA
             </Link>
-            <Link href="/" className="btn ghost lg">
+            <Link href="/games" className="btn ghost lg">
               VOLVER AL VAULT
             </Link>
           </div>

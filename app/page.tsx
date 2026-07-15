@@ -1,6 +1,5 @@
-import { GAMES } from "@/lib/data";
-import { Library } from "@/components/Library";
+import { Home } from "@/components/Home";
 
-export default function Home() {
-  return <Library games={GAMES} />;
+export default function LandingPage() {
+  return <Home />;
 }
