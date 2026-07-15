@@ -13,7 +13,7 @@ export default function NotFound() {
         <div className="pixel" style={{ fontSize: 14, color: "var(--ink-faint)", marginBottom: 24 }}>
           ESTE JUEGO SE QUEDÓ SIN CRÉDITOS
         </div>
-        <Link href="/" className="btn xl pulse">
+        <Link href="/games" className="btn xl pulse">
           ▶ VOLVER AL VAULT
         </Link>
       </div>
