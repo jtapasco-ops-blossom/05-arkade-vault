@@ -1,8 +1,12 @@
 import Link from "next/link";
-import { seededScores, type Game } from "@/lib/data";
+import type { Game, ScoreRow } from "@/lib/data";
 
-export function GameDetail({ game }: { game: Game }) {
-  const scores = seededScores(game.id.length * 17 + 3, 10);
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${d.getUTCFullYear()}`;
+}
+
+export function GameDetail({ game, scores }: { game: Game; scores: ScoreRow[] }) {
 
   return (
     <div className="av-detail fade-in">
@@ -55,11 +59,11 @@ export function GameDetail({ game }: { game: Game }) {
         <div className="leaderboard">
           <h3>MEJORES PUNTUACIONES</h3>
           {scores.map((r, i) => (
-            <div key={r.name} className={"lb-row" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")}>
-              <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
+            <div key={r.id} className={"lb-row" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")}>
+              <div className="rk">#{String(i + 1).padStart(2, "0")}</div>
               <div className="pl">
                 {r.name}
-                <div style={{ fontSize: 10, color: "var(--ink-faint)", letterSpacing: "0.1em" }}>{r.date}</div>
+                <div style={{ fontSize: 10, color: "var(--ink-faint)", letterSpacing: "0.1em" }}>{formatDate(r.created_at)}</div>
               </div>
               <div className="sc">{r.score.toLocaleString("es-ES")}</div>
             </div>

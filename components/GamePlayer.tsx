@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/SessionProvider";
@@ -8,7 +8,7 @@ import { AsteroidsGame, type AsteroidsGameRef, type AsteroidsSnapshot } from "@/
 
 export function GamePlayer({ game }: { game: Game }) {
   const router = useRouter();
-  const { user, saveScore } = useSession();
+  const { user } = useSession();
 
   const isRocas = game.id === "rocas";
   const gameRef = useRef<AsteroidsGameRef>(null);
@@ -18,8 +18,7 @@ export function GamePlayer({ game }: { game: Game }) {
   const [level, setLevel] = useState(1);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
-  const [name, setName] = useState(user ? user.name : "INVITADO");
-  const [saved, setSaved] = useState(false);
+  const [name] = useState(user ? user.name : "INVITADO");
   const displayLevel = isRocas ? level : Math.floor(score / 2500) + 1;
 
   // Reproductor simulado (solo para los juegos que aún no tienen engine real).
@@ -59,15 +58,7 @@ export function GamePlayer({ game }: { game: Game }) {
     setLevel(1);
     setPaused(false);
     setOver(false);
-    setSaved(false);
     if (isRocas) gameRef.current?.restart();
-  };
-
-  const onNameChange = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value.toUpperCase().slice(0, 10));
-
-  const handleSave = () => {
-    saveScore({ game: game.id, score, name });
-    setSaved(true);
   };
 
   return (
@@ -143,16 +134,14 @@ export function GamePlayer({ game }: { game: Game }) {
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString("es-ES")}</div>
-            {!saved ? (
-              <div className="input-row">
-                <input value={name} onChange={onNameChange} placeholder="TUS INICIALES" />
-                <button className="btn yellow" onClick={handleSave}>
-                  GUARDAR PUNTUACIÓN
-                </button>
-              </div>
-            ) : (
-              <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
-            )}
+            <div className="input-row">
+              <button className="btn yellow" disabled title="Disponible cuando inicies sesión con tu cuenta">
+                GUARDAR PUNTUACIÓN
+              </button>
+            </div>
+            <div className="mono" style={{ fontSize: 10, color: "var(--ink-dim)", letterSpacing: "0.12em", marginTop: 8 }}>
+              ▸ GUARDAR PUNTUACIÓN LLEGARÁ CON TU CUENTA (PRÓXIMAMENTE)
+            </div>
             <div className="actions">
               <button className="btn" onClick={restart}>
                 JUGAR DE NUEVO
