@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { GAMES } from "@/lib/data";
 import { GamePlayer } from "@/components/GamePlayer";
+import { getGame } from "@/lib/queries";
 
 export default async function GamePlayerPage({
   params,
@@ -8,7 +8,7 @@ export default async function GamePlayerPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const game = GAMES.find((g) => g.id === id);
+  const game = await getGame(id);
 
   if (!game) notFound();
 

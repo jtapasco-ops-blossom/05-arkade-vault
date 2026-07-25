@@ -1,6 +1,7 @@
-import { GAMES } from "@/lib/data";
 import { Library } from "@/components/Library";
+import { getGames } from "@/lib/queries";
 
-export default function GamesPage() {
-  return <Library games={GAMES} />;
+export default async function GamesPage() {
+  const games = await getGames();
+  return <Library games={games} />;
 }

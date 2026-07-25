@@ -6,18 +6,10 @@ export interface SessionUser {
   name: string;
 }
 
-export interface SavedScore {
-  game: string;
-  name: string;
-  score: number;
-  at: number;
-}
-
 interface SessionValue {
   user: SessionUser | null;
   login: (u: SessionUser | null) => void;
   signOut: () => void;
-  saveScore: (entry: { game: string; name: string; score: number }) => void;
 }
 
 const SessionContext = createContext<SessionValue | null>(null);
@@ -71,16 +63,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     notify();
   }, []);
 
-  const saveScore: SessionValue["saveScore"] = (entry) => {
-    try {
-      const all = JSON.parse(localStorage.getItem("av_scores") || "[]");
-      all.push({ ...entry, at: Date.now() });
-      localStorage.setItem("av_scores", JSON.stringify(all));
-    } catch {}
-  };
-
   return (
-    <SessionContext.Provider value={{ user, login, signOut, saveScore }}>
+    <SessionContext.Provider value={{ user, login, signOut }}>
       {children}
     </SessionContext.Provider>
   );

@@ -2,18 +2,21 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { GAMES, seededScores } from "@/lib/data";
-import { useSession } from "@/components/SessionProvider";
+import type { Game, ScoreRow } from "@/lib/data";
 
-export function HallOfFame() {
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${d.getUTCFullYear()}`;
+}
+
+export function HallOfFame({ games, scores }: { games: Game[]; scores: ScoreRow[] }) {
   const router = useRouter();
-  const { user } = useSession();
-  const [tab, setTab] = useState(GAMES[0].id);
+  const [tab, setTab] = useState(games[0].id);
 
-  const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
-  const game = GAMES.find((g) => g.id === tab)!;
-  const youRank = user ? Math.floor(8 + (tab.length % 4)) : null;
-  const youScore = user ? rows[5]?.score - 2400 : null;
+  const rows = useMemo(
+    () => scores.filter((s) => s.game_id === tab).slice(0, 12),
+    [scores, tab],
+  );
 
   return (
     <div className="av-hall fade-in">
@@ -25,7 +28,7 @@ export function HallOfFame() {
       </div>
 
       <div className="hall-tabs">
-        {GAMES.map((g) => (
+        {games.map((g) => (
           <button key={g.id} className={"chip" + (tab === g.id ? " active" : "")} onClick={() => setTab(g.id)}>
             {g.title}
           </button>
@@ -37,7 +40,7 @@ export function HallOfFame() {
           <div className="rank-num">02</div>
           <div className="name">{rows[1].name}</div>
           <div className="score">{rows[1].score.toLocaleString("es-ES")}</div>
-          <div className="date">{rows[1].date}</div>
+          <div className="date">{formatDate(rows[1].created_at)}</div>
         </div>
         <div className="podium-slot gold">
           <div className="pixel" style={{ fontSize: 9, color: "var(--gold)", letterSpacing: "0.18em" }}>
@@ -50,13 +53,13 @@ export function HallOfFame() {
           <div className="score" style={{ fontSize: 20 }}>
             {rows[0].score.toLocaleString("es-ES")}
           </div>
-          <div className="date">{rows[0].date}</div>
+          <div className="date">{formatDate(rows[0].created_at)}</div>
         </div>
         <div className="podium-slot bronze">
           <div className="rank-num">03</div>
           <div className="name">{rows[2].name}</div>
           <div className="score">{rows[2].score.toLocaleString("es-ES")}</div>
-          <div className="date">{rows[2].date}</div>
+          <div className="date">{formatDate(rows[2].created_at)}</div>
         </div>
       </div>
 
@@ -69,33 +72,16 @@ export function HallOfFame() {
         </div>
         {rows.map((r, i) => (
           <div
-            key={r.name + i}
+            key={r.id}
             className={"tr" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")}
             style={{ animationDelay: `${i * 50}ms` }}
           >
-            <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
+            <div className="rk">#{String(i + 1).padStart(2, "0")}</div>
             <div className="pl">{r.name}</div>
             <div className="sc">{r.score.toLocaleString("es-ES")}</div>
-            <div className="dt">{r.date}</div>
+            <div className="dt">{formatDate(r.created_at)}</div>
           </div>
         ))}
-        {user && (
-          <>
-            <div className="tr you-label">▸ TU MEJOR MARCA EN {game.title}</div>
-            <div className="tr you" style={{ animationDelay: `${rows.length * 50 + 50}ms` }}>
-              <div className="rk" style={{ color: "var(--yellow)" }}>
-                #{String(youRank).padStart(2, "0")}
-              </div>
-              <div className="pl" style={{ color: "var(--yellow)" }}>
-                {user.name}
-              </div>
-              <div className="sc" style={{ color: "var(--yellow)", textShadow: "0 0 6px rgba(245,255,0,0.5)" }}>
-                {(youScore || 9999).toLocaleString("es-ES")}
-              </div>
-              <div className="dt">11/05/2026</div>
-            </div>
-          </>
-        )}
       </div>
 
       <div style={{ textAlign: "center", marginTop: 32 }}>
