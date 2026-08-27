@@ -4,14 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/SessionProvider";
-import { AsteroidsGame, type AsteroidsGameRef, type AsteroidsSnapshot } from "@/components/games/AsteroidsGame";
+import { ENGINES } from "@/lib/games/registry";
+import type { GameEngineRef, GameSnapshot } from "@/lib/games/types";
 
 export function GamePlayer({ game }: { game: Game }) {
   const router = useRouter();
   const { user } = useSession();
 
-  const isRocas = game.id === "rocas";
-  const gameRef = useRef<AsteroidsGameRef>(null);
+  const Engine = ENGINES[game.id];
+  const hasEngine = Boolean(Engine);
+  const gameRef = useRef<GameEngineRef>(null);
 
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -19,17 +21,35 @@ export function GamePlayer({ game }: { game: Game }) {
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
   const [name] = useState(user ? user.name : "INVITADO");
-  const displayLevel = isRocas ? level : Math.floor(score / 2500) + 1;
+  const displayLevel = hasEngine ? level : Math.floor(score / 2500) + 1;
 
   // Reproductor simulado (solo para los juegos que aún no tienen engine real).
   useEffect(() => {
-    if (isRocas || over || paused) return;
+    if (hasEngine || over || paused) return;
     const t = setInterval(() => setScore((s) => s + Math.floor(10 + Math.random() * 90)), 220);
     return () => clearInterval(t);
-  }, [isRocas, over, paused]);
+  }, [hasEngine, over, paused]);
 
-  // Estado real del engine de asteroides.
-  const onSnapshot = (snap: AsteroidsSnapshot) => {
+  // Atajo de teclado: Escape pausa/reanuda (solo con engine real), sincronizado
+  // con el overlay "EN PAUSA" y el pause()/resume() del engine.
+  useEffect(() => {
+    if (!hasEngine) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== "Escape") return;
+      e.preventDefault();
+      setPaused((p) => {
+        const next = !p;
+        if (next) gameRef.current?.pause();
+        else gameRef.current?.resume();
+        return next;
+      });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [hasEngine]);
+
+  // Estado real del engine (asteroides, tetris, …).
+  const onSnapshot = (snap: GameSnapshot) => {
     setScore(snap.score);
     setLives(snap.lives);
     setLevel(snap.level);
@@ -39,7 +59,7 @@ export function GamePlayer({ game }: { game: Game }) {
   const togglePause = () => {
     setPaused((p) => {
       const next = !p;
-      if (isRocas) {
+      if (hasEngine) {
         if (next) gameRef.current?.pause();
         else gameRef.current?.resume();
       }
@@ -48,7 +68,7 @@ export function GamePlayer({ game }: { game: Game }) {
   };
 
   const endGame = () => {
-    if (isRocas) gameRef.current?.forceGameOver();
+    if (hasEngine) gameRef.current?.forceGameOver();
     else setOver(true);
   };
 
@@ -58,7 +78,7 @@ export function GamePlayer({ game }: { game: Game }) {
     setLevel(1);
     setPaused(false);
     setOver(false);
-    if (isRocas) gameRef.current?.restart();
+    if (hasEngine) gameRef.current?.restart();
   };
 
   return (
@@ -97,8 +117,8 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          {isRocas ? (
-            <AsteroidsGame ref={gameRef} onSnapshot={onSnapshot} />
+          {Engine ? (
+            <Engine ref={gameRef} onSnapshot={onSnapshot} />
           ) : (
             <div className="game-arena">
               <div className="grid-floor"></div>
