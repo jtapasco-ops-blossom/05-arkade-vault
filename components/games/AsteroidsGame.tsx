@@ -1,20 +1,10 @@
 "use client";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { createAsteroidsGame, type AsteroidsGameHandle, type AsteroidsSnapshot } from "@/lib/games/asteroids";
+import { createAsteroidsGame, type AsteroidsGameHandle } from "@/lib/games/asteroids";
+import type { GameEngineRef, GameSnapshot } from "@/lib/games/types";
 
-export type { AsteroidsSnapshot } from "@/lib/games/asteroids";
-
-// La ref imperativa que expone el componente al padre (GamePlayer) para
-// cablear los botones PAUSA / FIN / JUGAR DE NUEVO.
-export interface AsteroidsGameRef {
-  pause(): void;
-  resume(): void;
-  forceGameOver(): void;
-  restart(): void;
-}
-
-export const AsteroidsGame = forwardRef<AsteroidsGameRef, { onSnapshot: (snap: AsteroidsSnapshot) => void }>(
+export const AsteroidsGame = forwardRef<GameEngineRef, { onSnapshot: (snap: GameSnapshot) => void }>(
   function AsteroidsGame({ onSnapshot }, ref) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const gameRef = useRef<AsteroidsGameHandle | null>(null);
