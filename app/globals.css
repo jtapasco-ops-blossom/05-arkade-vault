@@ -686,8 +686,9 @@ a { color: inherit; text-decoration: none; }
   background: var(--green); box-shadow: 0 0 6px var(--green);
 }
 
-/* real canvas game (asteroids) — buffer 800x600 escalado a la pantalla CRT (4:3) */
-.asteroids-canvas {
+/* real canvas games con buffer 800x600 escalado a la pantalla CRT (4:3) */
+.asteroids-canvas,
+.bricks-canvas {
   position: absolute;
   inset: 0;
   display: block;
