@@ -6,6 +6,7 @@ import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import type { GameEngineRef, GameSnapshot } from "@/lib/games/types";
 import { AsteroidsGame } from "@/components/games/AsteroidsGame";
 import { TetrisGame } from "@/components/games/TetrisGame";
+import { BloqueBusterGame } from "@/components/games/BloqueBusterGame";
 
 export type GameEngineComponent = ForwardRefExoticComponent<
   { onSnapshot: (snap: GameSnapshot) => void } & RefAttributes<GameEngineRef>
@@ -14,4 +15,5 @@ export type GameEngineComponent = ForwardRefExoticComponent<
 export const ENGINES: Record<string, GameEngineComponent> = {
   rocas: AsteroidsGame,
   caida: TetrisGame,
+  "bloque-buster": BloqueBusterGame,
 };
